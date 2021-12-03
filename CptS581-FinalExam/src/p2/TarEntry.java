@@ -145,8 +145,8 @@ extends		Object
 	equals( TarEntry it )
 		{
 		return
-			this.header.name.toString().equals
-				( it.header.name.toString() );
+			this.header.getName().equals
+				( it.header.getName() );
 		}
 
 	/**
@@ -161,8 +161,8 @@ extends		Object
 	isDescendent( TarEntry desc )
 		{
 		return
-			desc.header.name.toString().startsWith
-				( this.header.name.toString() );
+			desc.header.getName().startsWith
+				( this.header.getName() );
 		}
 
 	/**
@@ -184,7 +184,7 @@ extends		Object
 	public String
 	getName()
 		{
-		return this.header.name.toString();
+		return this.header.getName();
 		}
 
 	/**
@@ -195,8 +195,7 @@ extends		Object
 	public void
 	setName( String name )
 		{
-		this.header.name =
-			new StringBuffer( name );
+		this.header.setName(new StringBuffer( name ));
 		}
 
 	/**
@@ -207,7 +206,7 @@ extends		Object
 	public int
 	getUserId()
 		{
-		return this.header.userId;
+		return this.header.getUserId();
 		}
 
 	/**
@@ -218,7 +217,7 @@ extends		Object
 	public void
 	setUserId( int userId )
 		{
-		this.header.userId = userId;
+		this.header.setUserId(userId);
 		}
 
 	/**
@@ -229,7 +228,7 @@ extends		Object
 	public int
 	getGroupId()
 		{
-		return this.header.groupId;
+		return this.header.getGroupId();
 		}
 
 	/**
@@ -240,7 +239,7 @@ extends		Object
 	public void
 	setGroupId( int groupId )
 		{
-		this.header.groupId = groupId;
+		this.header.setGroupId(groupId);
 		}
 
 	/**
@@ -251,7 +250,7 @@ extends		Object
 	public String
 	getUserName()
 		{
-		return this.header.userName.toString();
+		return this.header.getUserName().toString();
 		}
 
 	/**
@@ -262,8 +261,7 @@ extends		Object
 	public void
 	setUserName( String userName )
 		{
-		this.header.userName =
-			new StringBuffer( userName );
+		this.header.setUserName(new StringBuffer( userName ));
 		}
 
 	/**
@@ -274,7 +272,7 @@ extends		Object
 	public String
 	getGroupName()
 		{
-		return this.header.groupName.toString();
+		return this.header.getGroupName().toString();
 		}
 
 	/**
@@ -285,8 +283,7 @@ extends		Object
 	public void
 	setGroupName( String groupName )
 		{
-		this.header.groupName =
-			new StringBuffer( groupName );
+		this.header.setGroupName(new StringBuffer( groupName ));
 		}
 
 	/**
@@ -324,7 +321,7 @@ extends		Object
 	public void
 	setModTime( long time )
 		{
-		this.header.modTime = time / 1000;
+		this.header.setModTime(time / 1000);
 		}
 
 	/**
@@ -335,7 +332,7 @@ extends		Object
 	public void
 	setModTime( Date time )
 		{
-		this.header.modTime = time.getTime() / 1000;
+		this.header.setModTime(time.getTime() / 1000);
 		}
 
 	/**
@@ -346,7 +343,7 @@ extends		Object
 	public Date
 	getModTime()
 		{
-		return new Date( this.header.modTime * 1000 );
+		return new Date( this.header.getModTime() * 1000 );
 		}
 
 	/**
@@ -368,7 +365,7 @@ extends		Object
 	public long
 	getSize()
 		{
-		return this.header.size;
+		return this.header.getSize();
 		}
 
 	/**
@@ -379,7 +376,7 @@ extends		Object
 	public void
 	setSize( long size )
 		{
-		this.header.size = size;
+		this.header.setSize(size);
 		}
 
 	/**
@@ -411,10 +408,10 @@ extends		Object
 
 		if ( this.header != null )
 			{
-			if ( this.header.linkFlag == TarHeader.LF_DIR )
+			if ( this.header.getLinkFlag() == TarHeader.LF_DIR )
 				return true;
 
-			if ( this.header.name.toString().endsWith( "/" ) )
+			if ( this.header.getName().endsWith( "/" ) )
 				return true;
 			}
 
@@ -473,30 +470,30 @@ extends		Object
 		for ( ; name.startsWith( "/" ) ; )
 			name = name.substring( 1 );
 
- 		hdr.linkName = new StringBuffer( "" );
+ 		hdr.setLinkName(new StringBuffer( "" ));
 
-		hdr.name = new StringBuffer( name );
+		hdr.setName(new StringBuffer( name ));
 
 		if ( file.isDirectory() )
 			{
-			hdr.mode = 040755;
-			hdr.linkFlag = TarHeader.LF_DIR;
-			if ( hdr.name.charAt( hdr.name.length() - 1 ) != '/' )
+			hdr.setMode(040755);
+			hdr.setLinkFlag(TarHeader.LF_DIR);
+			if ( hdr.getName().charAt( hdr.getName().length() - 1 ) != '/' )
 				hdr.name.append( "/" );
 			}
 		else
 			{
-			hdr.mode = 0100644;
-			hdr.linkFlag = TarHeader.LF_NORMAL;
+			hdr.setMode(0100644);
+			hdr.setLinkFlag(TarHeader.LF_NORMAL);
 			}
 
 		// UNDONE When File lets us get the userName, use it!
 
-		hdr.size = file.length();
-		hdr.modTime = file.lastModified() / 1000;
-		hdr.checkSum = 0;
-		hdr.devMajor = 0;
-		hdr.devMinor = 0;
+		hdr.setSize(file.length());
+		hdr.setModTime(file.lastModified() / 1000);
+		hdr.setCheckSum(0);
+		hdr.setDevMajor(0);
+		hdr.setDevMinor(0);
 		}
 
 	/**
@@ -562,45 +559,45 @@ extends		Object
 			( this.header.name, outbuf, offset, TarHeader.NAMELEN );
 
 		offset = TarHeader.getOctalBytes
-			( this.header.mode, outbuf, offset, TarHeader.MODELEN );
+			( this.header.getMode(), outbuf, offset, TarHeader.MODELEN );
 
 		offset = TarHeader.getOctalBytes
-			( this.header.userId, outbuf, offset, TarHeader.UIDLEN );
+			( this.header.getUserId(), outbuf, offset, TarHeader.UIDLEN );
 
 		offset = TarHeader.getOctalBytes
-			( this.header.groupId, outbuf, offset, TarHeader.GIDLEN );
+			( this.header.getGroupId(), outbuf, offset, TarHeader.GIDLEN );
 
-		long size = this.header.size;
+		long size = this.header.getSize();
 
 		offset = TarHeader.getLongOctalBytes
 			( size, outbuf, offset, TarHeader.SIZELEN );
 
 		offset = TarHeader.getLongOctalBytes
-			( this.header.modTime, outbuf, offset, TarHeader.MODTIMELEN );
+			( this.header.getModTime(), outbuf, offset, TarHeader.MODTIMELEN );
 
 		int csOffset = offset;
 		for ( int c = 0 ; c < TarHeader.CHKSUMLEN ; ++c )
 			outbuf[ offset++ ] = (byte) ' ';
 
-		outbuf[ offset++ ] = this.header.linkFlag;
+		outbuf[ offset++ ] = this.header.getLinkFlag();
 
 		offset = TarHeader.getNameBytes
-			( this.header.linkName, outbuf, offset, TarHeader.NAMELEN );
+			( this.header.getLinkName(), outbuf, offset, TarHeader.NAMELEN );
 
 		offset = TarHeader.getNameBytes
-			( this.header.magic, outbuf, offset, TarHeader.MAGICLEN );
+			( this.header.getMagic(), outbuf, offset, TarHeader.MAGICLEN );
 
 		offset = TarHeader.getNameBytes
-			( this.header.userName, outbuf, offset, TarHeader.UNAMELEN );
+			( this.header.getUserName(), outbuf, offset, TarHeader.UNAMELEN );
 
 		offset = TarHeader.getNameBytes
-			( this.header.groupName, outbuf, offset, TarHeader.GNAMELEN );
+			( this.header.getGroupName(), outbuf, offset, TarHeader.GNAMELEN );
 
 		offset = TarHeader.getOctalBytes
-			( this.header.devMajor, outbuf, offset, TarHeader.DEVLEN );
+			( this.header.getDevMajor(), outbuf, offset, TarHeader.DEVLEN );
 
 		offset = TarHeader.getOctalBytes
-			( this.header.devMinor, outbuf, offset, TarHeader.DEVLEN );
+			( this.header.getDevMinor(), outbuf, offset, TarHeader.DEVLEN );
 
 		for ( ; offset < outbuf.length ; )
 			outbuf[ offset++ ] = 0;
@@ -623,70 +620,70 @@ extends		Object
 		{
 		int offset = 0;
 
-		hdr.name =
-			TarHeader.parseName( header, offset, TarHeader.NAMELEN );
+		hdr.setName(
+				TarHeader.parseName( header, offset, TarHeader.NAMELEN ));
 
 		offset += TarHeader.NAMELEN;
 
-		hdr.mode = (int)
-			TarHeader.parseOctal( header, offset, TarHeader.MODELEN );
+		hdr.setMode((int)
+			TarHeader.parseOctal( header, offset, TarHeader.MODELEN ));
 
 		offset += TarHeader.MODELEN;
 
-		hdr.userId = (int)
-			TarHeader.parseOctal( header, offset, TarHeader.UIDLEN );
+		hdr.setUserId((int)
+			TarHeader.parseOctal( header, offset, TarHeader.UIDLEN ));
 
 		offset += TarHeader.UIDLEN;
 
-		hdr.groupId = (int)
-			TarHeader.parseOctal( header, offset, TarHeader.GIDLEN );
+		hdr.setGroupId((int)
+			TarHeader.parseOctal( header, offset, TarHeader.GIDLEN ));
 
 		offset += TarHeader.GIDLEN;
 
-		hdr.size =
-			TarHeader.parseOctal( header, offset, TarHeader.SIZELEN );
+		hdr.setSize(
+			TarHeader.parseOctal( header, offset, TarHeader.SIZELEN ));
 
 		offset += TarHeader.SIZELEN;
 
-		hdr.modTime =
-			TarHeader.parseOctal( header, offset, TarHeader.MODTIMELEN );
+		hdr.setModTime(
+			TarHeader.parseOctal( header, offset, TarHeader.MODTIMELEN ));
 
 		offset += TarHeader.MODTIMELEN;
 
-		hdr.checkSum = (int)
-			TarHeader.parseOctal( header, offset, TarHeader.CHKSUMLEN );
+		hdr.setCheckSum((int)
+			TarHeader.parseOctal( header, offset, TarHeader.CHKSUMLEN ));
 
 		offset += TarHeader.CHKSUMLEN;
 
-		hdr.linkFlag = header[ offset++ ];
+		hdr.setLinkFlag(header[ offset++ ]);
 
-		hdr.linkName =
-			TarHeader.parseName( header, offset, TarHeader.NAMELEN );
+		hdr.setLinkName(
+			TarHeader.parseName( header, offset, TarHeader.NAMELEN ));
 
 		offset += TarHeader.NAMELEN;
 
-		hdr.magic =
-			TarHeader.parseName( header, offset, TarHeader.MAGICLEN );
+		hdr.setMagic(
+			TarHeader.parseName( header, offset, TarHeader.MAGICLEN ));
 
 		offset += TarHeader.MAGICLEN;
 
-		hdr.userName =
-			TarHeader.parseName( header, offset, TarHeader.UNAMELEN );
+		hdr.setUserName(
+			TarHeader.parseName( header, offset, TarHeader.UNAMELEN ));
 
 		offset += TarHeader.UNAMELEN;
 
-		hdr.groupName =
-			TarHeader.parseName( header, offset, TarHeader.GNAMELEN );
+		hdr.setGroupName(
+			TarHeader.parseName( header, offset, TarHeader.GNAMELEN ));
 
 		offset += TarHeader.GNAMELEN;
 
-		hdr.devMajor = (int)
-			TarHeader.parseOctal( header, offset, TarHeader.DEVLEN );
+		hdr.setDevMajor((int)
+			TarHeader.parseOctal( header, offset, TarHeader.DEVLEN ));
 
 		offset += TarHeader.DEVLEN;
 
-		hdr.devMinor = (int)
-			TarHeader.parseOctal( header, offset, TarHeader.DEVLEN );
+		hdr.setDevMinor((int)
+			TarHeader.parseOctal( header, offset, TarHeader.DEVLEN ));
 		}
 
 	/**
@@ -700,29 +697,27 @@ extends		Object
 		{
 		boolean isDir = name.endsWith( "/" );
 
-		hdr.checkSum = 0;
-		hdr.devMajor = 0;
-		hdr.devMinor = 0;
+		hdr.setCheckSum(0);
+		hdr.setDevMajor(0);
+		hdr.setDevMinor(0);
 
-		hdr.name = new StringBuffer( name );
-		hdr.mode = isDir ? 040755 : 0100644;
-		hdr.userId = 0;
-		hdr.groupId = 0;
-		hdr.size = 0;
-		hdr.checkSum = 0;
+		hdr.setName(new StringBuffer( name ));
+		hdr.setMode(isDir ? 040755 : 0100644);
+		hdr.setUserId(0);
+		hdr.setGroupId(0);
+		hdr.setSize(0);
+		hdr.setCheckSum(0);
 
-		hdr.modTime =
-			(new java.util.Date()).getTime() / 1000;
+		hdr.setModTime((new java.util.Date()).getTime() / 1000);
 
-		hdr.linkFlag =
-			isDir ? TarHeader.LF_DIR : TarHeader.LF_NORMAL;
+		hdr.setLinkFlag(isDir ? TarHeader.LF_DIR : TarHeader.LF_NORMAL);
 
-		hdr.linkName = new StringBuffer( "" );
-		hdr.userName = new StringBuffer( "" );
-		hdr.groupName = new StringBuffer( "" );
+		hdr.setLinkName(new StringBuffer( "" ));
+		hdr.setUserName(new StringBuffer( "" ));
+		hdr.setGroupName(new StringBuffer( "" ));
 
-		hdr.devMajor = 0;
-		hdr.devMinor = 0;
+		hdr.setDevMajor(0);
+		hdr.setDevMinor(0);
 		}
 
 	}

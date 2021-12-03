@@ -119,60 +119,168 @@ TarHeader extends Object
 	/**
 	 * The entry's name.
 	 */
-	public StringBuffer		name;
+	StringBuffer		name;
 	/**
 	 * The entry's permission mode.
 	 */
-	public int				mode;
+	private int				mode;
 	/**
 	 * The entry's user id.
 	 */
-	public int				userId;
+	private int				userId;
 	/**
 	 * The entry's group id.
 	 */
-	public int				groupId;
+	private int				groupId;
 	/**
 	 * The entry's size.
 	 */
-	public long				size;
+	private long				size;
 	/**
 	 * The entry's modification time.
 	 */
-	public long				modTime;
+	private long				modTime;
 	/**
 	 * The entry's checksum.
 	 */
-	public int				checkSum;
+	private int				checkSum;
 	/**
 	 * The entry's link flag.
 	 */
-	public byte				linkFlag;
+	private byte				linkFlag;
 	/**
 	 * The entry's link name.
 	 */
-	public StringBuffer		linkName;
+	private StringBuffer		linkName;
 	/**
 	 * The entry's magic tag.
 	 */
-	public StringBuffer		magic;
+	private StringBuffer		magic;
 	/**
 	 * The entry's user name.
 	 */
-	public StringBuffer		userName;
+	private StringBuffer		userName;
 	/**
 	 * The entry's group name.
 	 */
-	public StringBuffer		groupName;
+	private StringBuffer		groupName;
 	/**
 	 * The entry's major device number.
 	 */
-	public int				devMajor;
+	private int				devMajor;
 	/**
 	 * The entry's minor device number.
 	 */
-	public int				devMinor;
+	private int				devMinor;
 
+
+	public int getMode() {
+		return mode;
+	}
+
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public int getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
+	}
+
+	public long getModTime() {
+		return modTime;
+	}
+
+	public void setModTime(long modTime) {
+		this.modTime = modTime;
+	}
+
+	public int getCheckSum() {
+		return checkSum;
+	}
+
+	public void setCheckSum(int checkSum) {
+		this.checkSum = checkSum;
+	}
+
+	public byte getLinkFlag() {
+		return linkFlag;
+	}
+
+	public void setLinkFlag(byte linkFlag) {
+		this.linkFlag = linkFlag;
+	}
+
+	public StringBuffer getLinkName() {
+		return linkName;
+	}
+
+	public void setLinkName(StringBuffer linkName) {
+		this.linkName = linkName;
+	}
+
+	public StringBuffer getMagic() {
+		return magic;
+	}
+
+	public void setMagic(StringBuffer magic) {
+		this.magic = magic;
+	}
+
+	public StringBuffer getUserName() {
+		return userName;
+	}
+
+	public void setUserName(StringBuffer userName) {
+		this.userName = userName;
+	}
+
+	public StringBuffer getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(StringBuffer groupName) {
+		this.groupName = groupName;
+	}
+
+	public int getDevMajor() {
+		return devMajor;
+	}
+
+	public void setDevMajor(int devMajor) {
+		this.devMajor = devMajor;
+	}
+
+	public int getDevMinor() {
+		return devMinor;
+	}
+
+	public void setDevMinor(int devMinor) {
+		this.devMinor = devMinor;
+	}
+
+	public void setName(StringBuffer name) {
+		this.name = name;
+	}
 
 	public
 	TarHeader()
