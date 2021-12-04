@@ -88,11 +88,11 @@ public class TarHeaderTest {
 		
 		assertEquals("ustar  ", TarHeader.GNU_TMAGIC);
 		
-		assertEquals(new StringBuffer(TarHeader.TMAGIC).toString(), testTarHeader.getMagic().toString());
+		assertEquals(new StringBuilder(TarHeader.TMAGIC).toString(), testTarHeader.getMagic().toString());
 		
-		assertEquals(new StringBuffer().toString(), testTarHeader.name.toString());
+		assertEquals(new StringBuilder().toString(), testTarHeader.name.toString());
 		
-		assertEquals(new StringBuffer().toString(), testTarHeader.getLinkName().toString());
+		assertEquals(new StringBuilder().toString(), testTarHeader.getLinkName().toString());
 		
 		String user =
 				System.getProperty( "user.name", "" );
@@ -100,9 +100,9 @@ public class TarHeaderTest {
 			if ( user.length() > 31 )
 				user = user.substring( 0, 31 );
 		
-		assertEquals(new StringBuffer(user).toString(), testTarHeader.getUserName().toString());
+		assertEquals(new StringBuilder(user).toString(), testTarHeader.getUserName().toString());
 		
-		assertEquals(new StringBuffer("").toString(), testTarHeader.getGroupName().toString());
+		assertEquals(new StringBuilder("").toString(), testTarHeader.getGroupName().toString());
 	}
 
 	@Ignore
@@ -129,7 +129,7 @@ public class TarHeaderTest {
 	@Test
 	public void testGetName() {
 		
-		assertEquals(new StringBuffer().toString(), testTarHeader.getName());
+		assertEquals(new StringBuilder().toString(), testTarHeader.getName());
 	}
 
 	@Test
@@ -246,65 +246,65 @@ public class TarHeaderTest {
 	@Test
 	public void testLinkName() {
 
-		testTarHeader.setLinkName(new StringBuffer("Test1"));
+		testTarHeader.setLinkName(new StringBuilder("Test1"));
 		
-		assertEquals(new StringBuffer("Test1").toString(), testTarHeader.getLinkName().toString());
+		assertEquals(new StringBuilder("Test1").toString(), testTarHeader.getLinkName().toString());
 		
-		testTarHeader.setLinkName(new StringBuffer("Test2"));
+		testTarHeader.setLinkName(new StringBuilder("Test2"));
 		
-		assertEquals(new StringBuffer("Test2").toString(), testTarHeader.getLinkName().toString());
+		assertEquals(new StringBuilder("Test2").toString(), testTarHeader.getLinkName().toString());
 		
-		testTarHeader.setLinkName(new StringBuffer("Test3"));
+		testTarHeader.setLinkName(new StringBuilder("Test3"));
 		
-		assertEquals(new StringBuffer("Test3").toString(), testTarHeader.getLinkName().toString());
+		assertEquals(new StringBuilder("Test3").toString(), testTarHeader.getLinkName().toString());
 	}
 
 	@Test
 	public void testMagic() {
 
-		testTarHeader.setMagic(new StringBuffer("Test1"));
+		testTarHeader.setMagic(new StringBuilder("Test1"));
 		
-		assertEquals(new StringBuffer("Test1").toString(), testTarHeader.getMagic().toString());
+		assertEquals(new StringBuilder("Test1").toString(), testTarHeader.getMagic().toString());
 		
-		testTarHeader.setMagic(new StringBuffer("Test2"));
+		testTarHeader.setMagic(new StringBuilder("Test2"));
 		
-		assertEquals(new StringBuffer("Test2").toString(), testTarHeader.getMagic().toString());
+		assertEquals(new StringBuilder("Test2").toString(), testTarHeader.getMagic().toString());
 		
-		testTarHeader.setMagic(new StringBuffer("Test3"));
+		testTarHeader.setMagic(new StringBuilder("Test3"));
 		
-		assertEquals(new StringBuffer("Test3").toString(), testTarHeader.getMagic().toString());
+		assertEquals(new StringBuilder("Test3").toString(), testTarHeader.getMagic().toString());
 	}
 
 	@Test
 	public void testUserName() {
 
-		testTarHeader.setUserName(new StringBuffer("Test1"));
+		testTarHeader.setUserName(new StringBuilder("Test1"));
 		
-		assertEquals(new StringBuffer("Test1").toString(), testTarHeader.getUserName().toString());
+		assertEquals(new StringBuilder("Test1").toString(), testTarHeader.getUserName().toString());
 		
-		testTarHeader.setUserName(new StringBuffer("Test2"));
+		testTarHeader.setUserName(new StringBuilder("Test2"));
 		
-		assertEquals(new StringBuffer("Test2").toString(), testTarHeader.getUserName().toString());
+		assertEquals(new StringBuilder("Test2").toString(), testTarHeader.getUserName().toString());
 		
-		testTarHeader.setUserName(new StringBuffer("Test3"));
+		testTarHeader.setUserName(new StringBuilder("Test3"));
 		
-		assertEquals(new StringBuffer("Test3").toString(), testTarHeader.getUserName().toString());
+		assertEquals(new StringBuilder("Test3").toString(), testTarHeader.getUserName().toString());
 	}
 
 	@Test
 	public void testGroupName() {
 
-		testTarHeader.setGroupName(new StringBuffer("Test1"));
+		testTarHeader.setGroupName(new StringBuilder("Test1"));
 		
-		assertEquals(new StringBuffer("Test1").toString(), testTarHeader.getGroupName().toString());
+		assertEquals(new StringBuilder("Test1").toString(), testTarHeader.getGroupName().toString());
 		
-		testTarHeader.setGroupName(new StringBuffer("Test2"));
+		testTarHeader.setGroupName(new StringBuilder("Test2"));
 		
-		assertEquals(new StringBuffer("Test2").toString(), testTarHeader.getGroupName().toString());
+		assertEquals(new StringBuilder("Test2").toString(), testTarHeader.getGroupName().toString());
 		
-		testTarHeader.setGroupName(new StringBuffer("Test3"));
+		testTarHeader.setGroupName(new StringBuilder("Test3"));
 		
-		assertEquals(new StringBuffer("Test3").toString(), testTarHeader.getGroupName().toString());
+		assertEquals(new StringBuilder("Test3").toString(), testTarHeader.getGroupName().toString());
 	}
 
 	@Test
@@ -370,10 +370,70 @@ public class TarHeaderTest {
 		fail("Not yet implemented");
 	}
 
-	@Ignore
 	@Test
 	public void testGetOctalBytes() {
-		fail("Not yet implemented");
+		
+		byte[] buf = new byte[345];
+		
+		testTarEntry.header = testTarHeader;
+		
+		int offset = 0;
+
+		offset = TarHeader.getNameBytes
+			( testTarHeader.name, buf, offset, TarHeader.NAMELEN );
+
+		offset = TarHeader.getOctalBytes
+			( testTarHeader.getMode(), buf, offset, TarHeader.MODELEN );
+
+		offset = TarHeader.getOctalBytes
+			( testTarHeader.getUserId(), buf, offset, TarHeader.UIDLEN );
+
+		offset = TarHeader.getOctalBytes
+			( testTarHeader.getGroupId(), buf, offset, TarHeader.GIDLEN );
+
+		long size = testTarHeader.getSize();
+
+		offset = TarHeader.getLongOctalBytes
+			( size, buf, offset, TarHeader.SIZELEN );
+
+		offset = TarHeader.getLongOctalBytes
+			( testTarHeader.getModTime(), buf, offset, TarHeader.MODTIMELEN );
+
+		int csOffset = offset;
+		for ( int c = 0 ; c < TarHeader.CHKSUMLEN ; ++c )
+			buf[ offset++ ] = (byte) ' ';
+
+		buf[ offset++ ] = testTarHeader.getLinkFlag();
+
+		offset = TarHeader.getNameBytes
+			( testTarHeader.getLinkName(), buf, offset, TarHeader.NAMELEN );
+
+		offset = TarHeader.getNameBytes
+			( testTarHeader.getMagic(), buf, offset, TarHeader.MAGICLEN );
+
+		offset = TarHeader.getNameBytes
+			( testTarHeader.getUserName(), buf, offset, TarHeader.UNAMELEN );
+
+		offset = TarHeader.getNameBytes
+			( testTarHeader.getGroupName(), buf, offset, TarHeader.GNAMELEN );
+
+		offset = TarHeader.getOctalBytes
+			( testTarHeader.getDevMajor(), buf, offset, TarHeader.DEVLEN );
+
+		offset = TarHeader.getOctalBytes
+			( testTarHeader.getDevMinor(), buf, offset, TarHeader.DEVLEN );
+
+		while (offset < buf.length)
+			buf[ offset++ ] = 0;
+
+		long checkSum = testTarEntry.computeCheckSum( buf );
+
+		TarHeader.getCheckSumOctalBytes
+			( checkSum, buf, csOffset, TarHeader.CHKSUMLEN );
+		
+		byte[] bufToCompare = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 54, 52, 49, 50, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 117, 115, 116, 97, 114, 0, 0, 0, 101, 109, 109, 97, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0};
+		
+		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
 	}
 
 	@Ignore

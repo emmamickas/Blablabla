@@ -195,7 +195,7 @@ extends		Object
 	public void
 	setName( String name )
 		{
-		this.header.setName(new StringBuffer( name ));
+		this.header.setName(new StringBuilder( name ));
 		}
 
 	/**
@@ -261,7 +261,7 @@ extends		Object
 	public void
 	setUserName( String userName )
 		{
-		this.header.setUserName(new StringBuffer( userName ));
+		this.header.setUserName(new StringBuilder( userName ));
 		}
 
 	/**
@@ -283,7 +283,7 @@ extends		Object
 	public void
 	setGroupName( String groupName )
 		{
-		this.header.setGroupName(new StringBuffer( groupName ));
+		this.header.setGroupName(new StringBuilder( groupName ));
 		}
 
 	/**
@@ -391,7 +391,7 @@ extends		Object
 		{
 		int offset = 0;
 		offset = TarHeader.getNameBytes
-			( new StringBuffer( newName ),
+			( new StringBuilder( newName ),
 				outbuf, offset, TarHeader.NAMELEN );
 		}
 
@@ -470,9 +470,9 @@ extends		Object
 		for ( ; name.startsWith( "/" ) ; )
 			name = name.substring( 1 );
 
- 		hdr.setLinkName(new StringBuffer( "" ));
+ 		hdr.setLinkName(new StringBuilder( "" ));
 
-		hdr.setName(new StringBuffer( name ));
+		hdr.setName(new StringBuilder( name ));
 
 		if ( file.isDirectory() )
 			{
@@ -701,7 +701,7 @@ extends		Object
 		hdr.setDevMajor(0);
 		hdr.setDevMinor(0);
 
-		hdr.setName(new StringBuffer( name ));
+		hdr.setName(new StringBuilder( name ));
 		hdr.setMode(isDir ? 040755 : 0100644);
 		hdr.setUserId(0);
 		hdr.setGroupId(0);
@@ -712,9 +712,9 @@ extends		Object
 
 		hdr.setLinkFlag(isDir ? TarHeader.LF_DIR : TarHeader.LF_NORMAL);
 
-		hdr.setLinkName(new StringBuffer( "" ));
-		hdr.setUserName(new StringBuffer( "" ));
-		hdr.setGroupName(new StringBuffer( "" ));
+		hdr.setLinkName(new StringBuilder( "" ));
+		hdr.setUserName(new StringBuilder( "" ));
+		hdr.setGroupName(new StringBuilder( "" ));
 
 		hdr.setDevMajor(0);
 		hdr.setDevMinor(0);

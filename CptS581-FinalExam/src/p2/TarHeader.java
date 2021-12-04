@@ -119,7 +119,7 @@ TarHeader extends Object
 	/**
 	 * The entry's name.
 	 */
-	StringBuffer		name;
+	StringBuilder		name;
 	/**
 	 * The entry's permission mode.
 	 */
@@ -151,19 +151,19 @@ TarHeader extends Object
 	/**
 	 * The entry's link name.
 	 */
-	private StringBuffer		linkName;
+	private StringBuilder		linkName;
 	/**
 	 * The entry's magic tag.
 	 */
-	private StringBuffer		magic;
+	private StringBuilder		magic;
 	/**
 	 * The entry's user name.
 	 */
-	private StringBuffer		userName;
+	private StringBuilder		userName;
 	/**
 	 * The entry's group name.
 	 */
-	private StringBuffer		groupName;
+	private StringBuilder		groupName;
 	/**
 	 * The entry's major device number.
 	 */
@@ -230,35 +230,35 @@ TarHeader extends Object
 		this.linkFlag = linkFlag;
 	}
 
-	public StringBuffer getLinkName() {
+	public StringBuilder getLinkName() {
 		return linkName;
 	}
 
-	public void setLinkName(StringBuffer linkName) {
+	public void setLinkName(StringBuilder linkName) {
 		this.linkName = linkName;
 	}
 
-	public StringBuffer getMagic() {
+	public StringBuilder getMagic() {
 		return magic;
 	}
 
-	public void setMagic(StringBuffer magic) {
+	public void setMagic(StringBuilder magic) {
 		this.magic = magic;
 	}
 
-	public StringBuffer getUserName() {
+	public StringBuilder getUserName() {
 		return userName;
 	}
 
-	public void setUserName(StringBuffer userName) {
+	public void setUserName(StringBuilder userName) {
 		this.userName = userName;
 	}
 
-	public StringBuffer getGroupName() {
+	public StringBuilder getGroupName() {
 		return groupName;
 	}
 
-	public void setGroupName(StringBuffer groupName) {
+	public void setGroupName(StringBuilder groupName) {
 		this.groupName = groupName;
 	}
 
@@ -278,17 +278,17 @@ TarHeader extends Object
 		this.devMinor = devMinor;
 	}
 
-	public void setName(StringBuffer name) {
+	public void setName(StringBuilder name) {
 		this.name = name;
 	}
 
 	public
 	TarHeader()
 		{
-		this.magic = new StringBuffer( TarHeader.TMAGIC );
+		this.magic = new StringBuilder( TarHeader.TMAGIC );
 
-		this.name = new StringBuffer();
-		this.linkName = new StringBuffer();
+		this.name = new StringBuilder();
+		this.linkName = new StringBuilder();
 
 		String user =
 			System.getProperty( "user.name", "" );
@@ -298,8 +298,8 @@ TarHeader extends Object
 
 		this.userId = 0;
 		this.groupId = 0;
-		this.userName = new StringBuffer( user );
-		this.groupName = new StringBuffer( "" );
+		this.userName = new StringBuilder( user );
+		this.groupName = new StringBuilder( "" );
 		}
 
 	/**
@@ -315,7 +315,7 @@ TarHeader extends Object
 
 			hdr.name =
 				(this.name == null ) ? null
-					: new StringBuffer( this.name.toString() );
+					: new StringBuilder( this.name.toString() );
 			hdr.mode = this.mode;
 			hdr.userId = this.userId;
 			hdr.groupId = this.groupId;
@@ -325,16 +325,16 @@ TarHeader extends Object
 			hdr.linkFlag = this.linkFlag;
 			hdr.linkName =
 				(this.linkName == null ) ? null
-					: new StringBuffer( this.linkName.toString() );
+					: new StringBuilder( this.linkName.toString() );
 			hdr.magic =
 				(this.magic == null ) ? null
-					: new StringBuffer( this.magic.toString() );
+					: new StringBuilder( this.magic.toString() );
 			hdr.userName =
 				(this.userName == null ) ? null
-					: new StringBuffer( this.userName.toString() );
+					: new StringBuilder( this.userName.toString() );
 			hdr.groupName =
 				(this.groupName == null ) ? null
-					: new StringBuffer( this.groupName.toString() );
+					: new StringBuilder( this.groupName.toString() );
 			hdr.devMajor = this.devMajor;
 			hdr.devMinor = this.devMinor;
 			}
@@ -406,11 +406,11 @@ TarHeader extends Object
 	 * @param length The number of header bytes to parse.
 	 * @return The header's entry name.
 	 */
-	public static StringBuffer
+	public static StringBuilder
 	parseName( byte[] header, int offset, int length )
 		throws InvalidHeaderException
 		{
-		StringBuffer result = new StringBuffer( length );
+		StringBuilder result = new StringBuilder( length );
 
 		int end = offset + length;
 		for ( int i = offset ; i < end ; ++i )
@@ -432,7 +432,7 @@ TarHeader extends Object
 	 * @return The number of bytes in a header's entry name.
 	 */
 	public static int
-	getNameBytes( StringBuffer name, byte[] buf, int offset, int length )
+	getNameBytes( StringBuilder name, byte[] buf, int offset, int length )
 		{
 		int i;
 
