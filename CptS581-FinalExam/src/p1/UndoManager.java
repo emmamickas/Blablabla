@@ -44,8 +44,8 @@ public class UndoManager {
 
 	public UndoManager(int newUndoStackSize) {
 		maxStackCapacity = newUndoStackSize;
-		undoStack = new Vector<Undoable>(maxStackCapacity);
-		redoStack = new Vector<Undoable>(maxStackCapacity);
+		undoStack = new Vector<>(maxStackCapacity);
+		redoStack = new Vector<>(maxStackCapacity);
 	}
 
 	public void pushUndo(Undoable undoActivity) {
@@ -60,7 +60,7 @@ public class UndoManager {
 			// a not undoable activity clears the stack because
 			// the last activity does not correspond with the
 			// last undo activity
-			undoStack = new Vector<Undoable>(maxStackCapacity);
+			undoStack = new Vector<>(maxStackCapacity);
 		}
 	}
 
@@ -80,7 +80,7 @@ public class UndoManager {
 			// a not undoable activity clears the tack because
 			// the last activity does not correspond with the
 			// last undo activity
-			redoStack = new Vector<Undoable>(maxStackCapacity);
+			redoStack = new Vector<>(maxStackCapacity);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class UndoManager {
 
 	protected Undoable peekUndo() {
 		if (getUndoSize() > 0) {
-			return (Undoable) undoStack.lastElement();
+			return undoStack.lastElement();
 		}
 		else {
 			return null;
@@ -113,7 +113,7 @@ public class UndoManager {
 
 	protected Undoable peekRedo() {
 		if (getRedoSize() > 0) {
-			return (Undoable) redoStack.lastElement();
+			return redoStack.lastElement();
 		}
 		else {
 			return null;

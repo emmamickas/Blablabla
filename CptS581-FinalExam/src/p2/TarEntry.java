@@ -142,7 +142,7 @@ extends		Object
 	 * @return True if the entries are equal.
 	 */
 	public boolean
-	equals( TarEntry it )
+	tarEntryEquals( TarEntry it )
 		{
 		return
 			this.header.getName().equals
@@ -390,7 +390,7 @@ extends		Object
 	adjustEntryName( byte[] outbuf, String newName )
 		{
 		int offset = 0;
-		offset = TarHeader.getNameBytes
+		TarHeader.getNameBytes
 			( new StringBuilder( newName ),
 				outbuf, offset, TarHeader.NAMELEN );
 		}
@@ -433,33 +433,24 @@ extends		Object
 		String name = file.getPath();
 		String osname = System.getProperty( "os.name" );
 		if ( osname != null )
-			{
+		{
 			// Strip off drive letters!
 			// REVIEW Would a better check be "(File.separator == '\')"?
 
-			// String Win32Prefix = "Windows";
-			// String prefix = osname.substring( 0, Win32Prefix.length() );
-			// if ( prefix.equalsIgnoreCase( Win32Prefix ) )
-
-			// if ( File.separatorChar == '\\' )
-
 			// Per Patrick Beard:
-			String Win32Prefix = "windows";
-			if ( osname.toLowerCase().startsWith( Win32Prefix ) )
+			String win32Prefix = "windows";
+			if ( osname.toLowerCase().startsWith( win32Prefix ) && name.length() > 2 )
+			{
+				char ch1 = name.charAt(0);
+				char ch2 = name.charAt(1);
+				if ( ch2 == ':'
+					&& ( (ch1 >= 'a' && ch1 <= 'z')
+						|| (ch1 >= 'A' && ch1 <= 'Z') ) )
 				{
-				if ( name.length() > 2 )
-					{
-					char ch1 = name.charAt(0);
-					char ch2 = name.charAt(1);
-					if ( ch2 == ':'
-						&& ( (ch1 >= 'a' && ch1 <= 'z')
-							|| (ch1 >= 'A' && ch1 <= 'Z') ) )
-						{
-						name = name.substring( 2 );
-						}
-					}
+				name = name.substring( 2 );
 				}
 			}
+		}
 
 		name = name.replace( File.separatorChar, '/' );
 
@@ -467,7 +458,7 @@ extends		Object
 		// Windows (and Posix?) paths can start with "\\NetworkDrive\",
 		// so we loop on starting /'s.
 		
-		for ( ; name.startsWith( "/" ) ; )
+		while (name.startsWith( "/" ))
 			name = name.substring( 1 );
 
  		hdr.setLinkName(new StringBuilder( "" ));
@@ -599,7 +590,7 @@ extends		Object
 		offset = TarHeader.getOctalBytes
 			( this.header.getDevMinor(), outbuf, offset, TarHeader.DEVLEN );
 
-		for ( ; offset < outbuf.length ; )
+		while (offset < outbuf.length)
 			outbuf[ offset++ ] = 0;
 
 		long checkSum = this.computeCheckSum( outbuf );

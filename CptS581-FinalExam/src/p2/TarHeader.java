@@ -460,8 +460,6 @@ TarHeader extends Object
 	public static int
 	getOctalBytes( long value, byte[] buf, int offset, int length )
 		{
-		byte[] result = new byte[ length ];
-
 		int idx = length - 1;
 
 		buf[ offset + idx ] = 0;
@@ -476,11 +474,10 @@ TarHeader extends Object
 			}
 		else
 			{
-			for ( long val = value ; idx >= 0 && val > 0 ; --idx )
+			for ( long val = value ; idx >= 0 && val > 0 ; --idx, val = val >> 3 )
 				{
 				buf[ offset + idx ] = (byte)
 					( (byte) '0' + (byte) (val & 7) );
-				val = val >> 3;
 				}
 			}
 
