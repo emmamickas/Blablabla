@@ -264,11 +264,11 @@ public class TarEntryTest {
 			if ( testTarEntry.header.getName().charAt( testTarEntry.header.getName().length() - 1 ) != '/' )
 			{
 				assertTrue(testTarEntry.header.getName().endsWith("/"));
-	 			assertEquals(new StringBuilder( name ).append("/").toString(), testTarEntry.header.getName().toString());
+	 			assertEquals(new StringBuilder( name ).append("/").toString(), testTarEntry.header.getName());
 			}
 			else
 			{
-				assertEquals(new StringBuilder( name ).toString(), testTarEntry.header.getName().toString());
+				assertEquals(new StringBuilder( name ).toString(), testTarEntry.header.getName());
 			}
 		}
 		else

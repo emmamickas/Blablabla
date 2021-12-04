@@ -73,7 +73,6 @@ import java.util.Date;
 
 public
 class		TarEntry
-extends		Object
 	{
 	/**
 	 * If this entry represents a File, this references it.
@@ -145,8 +144,7 @@ extends		Object
 	tarEntryEquals( TarEntry it )
 		{
 		return
-			this.header.getName().equals
-				( it.header.getName() );
+			this.header.getName().equals( it.header.getName() );
 		}
 
 	/**
@@ -161,8 +159,7 @@ extends		Object
 	isDescendent( TarEntry desc )
 		{
 		return
-			desc.header.getName().startsWith
-				( this.header.getName() );
+			desc.header.getName().startsWith( this.header.getName() );
 		}
 
 	/**
@@ -390,8 +387,7 @@ extends		Object
 	adjustEntryName( byte[] outbuf, String newName )
 		{
 		int offset = 0;
-		TarHeader.getNameBytes
-			( new StringBuilder( newName ),
+		TarHeader.getNameBytes( new StringBuilder( newName ),
 				outbuf, offset, TarHeader.NAMELEN );
 		}
 
@@ -510,8 +506,7 @@ extends		Object
 		for ( int i = 0 ; i < list.length ; ++i )
 			{
 			result[i] =
-				new TarEntry
-					( new File( this.file, list[i] ) );
+				new TarEntry( new File( this.file, list[i] ) );
 			}
 
 		return result;
@@ -546,25 +541,19 @@ extends		Object
 		{
 		int offset = 0;
 
-		offset = TarHeader.getNameBytes
-			( this.header.name, outbuf, offset, TarHeader.NAMELEN );
+		offset = TarHeader.getNameBytes( this.header.name, outbuf, offset, TarHeader.NAMELEN );
 
-		offset = TarHeader.getOctalBytes
-			( this.header.getMode(), outbuf, offset, TarHeader.MODELEN );
+		offset = TarHeader.getOctalBytes( this.header.getMode(), outbuf, offset, TarHeader.MODELEN );
 
-		offset = TarHeader.getOctalBytes
-			( this.header.getUserId(), outbuf, offset, TarHeader.UIDLEN );
+		offset = TarHeader.getOctalBytes( this.header.getUserId(), outbuf, offset, TarHeader.UIDLEN );
 
-		offset = TarHeader.getOctalBytes
-			( this.header.getGroupId(), outbuf, offset, TarHeader.GIDLEN );
+		offset = TarHeader.getOctalBytes( this.header.getGroupId(), outbuf, offset, TarHeader.GIDLEN );
 
 		long size = this.header.getSize();
 
-		offset = TarHeader.getLongOctalBytes
-			( size, outbuf, offset, TarHeader.SIZELEN );
+		offset = TarHeader.getLongOctalBytes( size, outbuf, offset, TarHeader.SIZELEN );
 
-		offset = TarHeader.getLongOctalBytes
-			( this.header.getModTime(), outbuf, offset, TarHeader.MODTIMELEN );
+		offset = TarHeader.getLongOctalBytes( this.header.getModTime(), outbuf, offset, TarHeader.MODTIMELEN );
 
 		int csOffset = offset;
 		for ( int c = 0 ; c < TarHeader.CHKSUMLEN ; ++c )
@@ -572,31 +561,24 @@ extends		Object
 
 		outbuf[ offset++ ] = this.header.getLinkFlag();
 
-		offset = TarHeader.getNameBytes
-			( this.header.getLinkName(), outbuf, offset, TarHeader.NAMELEN );
+		offset = TarHeader.getNameBytes( this.header.getLinkName(), outbuf, offset, TarHeader.NAMELEN );
 
-		offset = TarHeader.getNameBytes
-			( this.header.getMagic(), outbuf, offset, TarHeader.MAGICLEN );
+		offset = TarHeader.getNameBytes( this.header.getMagic(), outbuf, offset, TarHeader.MAGICLEN );
 
-		offset = TarHeader.getNameBytes
-			( this.header.getUserName(), outbuf, offset, TarHeader.UNAMELEN );
+		offset = TarHeader.getNameBytes( this.header.getUserName(), outbuf, offset, TarHeader.UNAMELEN );
 
-		offset = TarHeader.getNameBytes
-			( this.header.getGroupName(), outbuf, offset, TarHeader.GNAMELEN );
+		offset = TarHeader.getNameBytes( this.header.getGroupName(), outbuf, offset, TarHeader.GNAMELEN );
 
-		offset = TarHeader.getOctalBytes
-			( this.header.getDevMajor(), outbuf, offset, TarHeader.DEVLEN );
+		offset = TarHeader.getOctalBytes( this.header.getDevMajor(), outbuf, offset, TarHeader.DEVLEN );
 
-		offset = TarHeader.getOctalBytes
-			( this.header.getDevMinor(), outbuf, offset, TarHeader.DEVLEN );
+		offset = TarHeader.getOctalBytes( this.header.getDevMinor(), outbuf, offset, TarHeader.DEVLEN );
 
 		while (offset < outbuf.length)
 			outbuf[ offset++ ] = 0;
 
 		long checkSum = this.computeCheckSum( outbuf );
 
-		TarHeader.getCheckSumOctalBytes
-			( checkSum, outbuf, csOffset, TarHeader.CHKSUMLEN );
+		TarHeader.getCheckSumOctalBytes( checkSum, outbuf, csOffset, TarHeader.CHKSUMLEN );
 		}
 
 	/**
@@ -699,7 +681,7 @@ extends		Object
 		hdr.setSize(0);
 		hdr.setCheckSum(0);
 
-		hdr.setModTime((new java.util.Date()).getTime() / 1000);
+		hdr.setModTime((new Date()).getTime() / 1000);
 
 		hdr.setLinkFlag(isDir ? TarHeader.LF_DIR : TarHeader.LF_NORMAL);
 
