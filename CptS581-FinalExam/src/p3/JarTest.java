@@ -51,11 +51,13 @@ public class JarTest {
 		fail("Not yet implemented");
 	}
 
+	@Ignore
 	@Test
 	public void testGrabNonFileSetResources() {
 		fail("Not yet implemented");
 	}
 
+	@Ignore
 	@Test
 	public void testGrabResources() {
 		fail("Not yet implemented");

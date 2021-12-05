@@ -398,6 +398,12 @@ TarHeader
 
 	}
 
+	/**
+	 * Fill in a TarHeader with information from a File.
+	 *
+	 * @param hdr The TarHeader to fill in.
+	 * @param file The file from which to get the header information.
+	 */
 	public void getFileTarHeader(File file) {
 		String fileName = file.getPath();
 		String osname = System.getProperty( "os.name" );
