@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -83,16 +84,11 @@ public class TarEntryTest {
 		fail("Not yet implemented");
 	}
 
-	@Ignore
-	@Test
-	public void testGetName() {
-		fail("Not yet implemented");
-	}
-
-	@Ignore
 	@Test
 	public void testSetName() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setName(new StringBuilder("Hello"));
+		
+		assertTrue(testTarEntry.getHeader().getName().equals("Hello"));
 	}
 
 	@Ignore
@@ -101,10 +97,11 @@ public class TarEntryTest {
 		fail("Not yet implemented");
 	}
 
-	@Ignore
 	@Test
 	public void testSetUserId() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setUserId(10);
+		
+		assertEquals(10, testTarEntry.getHeader().getUserId());
 	}
 
 	@Ignore
@@ -113,10 +110,11 @@ public class TarEntryTest {
 		fail("Not yet implemented");
 	}
 
-	@Ignore
 	@Test
 	public void testSetGroupId() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setGroupId(10);
+		
+		assertEquals(10, testTarEntry.getHeader().getGroupId());
 	}
 
 	@Ignore
@@ -125,46 +123,49 @@ public class TarEntryTest {
 		fail("Not yet implemented");
 	}
 
-	@Ignore
 	@Test
 	public void testSetUserName() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setUserName(new StringBuilder("Hello"));
+		
+		assertTrue(testTarEntry.getHeader().getUserName().toString().equals("Hello"));
 	}
-
+	
 	@Ignore
 	@Test
 	public void testGetGroupName() {
 		fail("Not yet implemented");
 	}
 
-	@Ignore
 	@Test
 	public void testSetGroupName() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setGroupName(new StringBuilder("Hello"));
+		
+		assertTrue(testTarEntry.getHeader().getGroupName().toString().equals("Hello"));
 	}
 
-	@Ignore
 	@Test
 	public void testSetIds() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setIds(10, 20);
+		
+		assertEquals(10, testTarEntry.getHeader().getUserId());
+		
+		assertEquals(20, testTarEntry.getHeader().getGroupId());
 	}
 
-	@Ignore
 	@Test
 	public void testSetNames() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setNames("Hello", "How are you?");
+		
+		assertTrue(testTarEntry.getHeader().getUserName().toString().equals("Hello"));
+		
+		assertTrue(testTarEntry.getHeader().getGroupName().toString().equals("How are you?"));
 	}
 
-	@Ignore
 	@Test
 	public void testSetModTimeLong() {
-		fail("Not yet implemented");
-	}
-
-	@Ignore
-	@Test
-	public void testSetModTimeDate() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setModTime(10);
+		
+		assertEquals(10, testTarEntry.getHeader().getModTime());
 	}
 
 	@Ignore
@@ -188,37 +189,40 @@ public class TarEntryTest {
 	@Ignore
 	@Test
 	public void testSetSize() {
-		fail("Not yet implemented");
+		testTarEntry.getHeader().setSize(10);
+		
+		assertEquals(10, testTarEntry.getHeader().getSize());
 	}
 
-	@Test
-	public void testAdjustEntryName() {
-
-		byte[] buf = new byte[100];
-		
-		testTarEntry.adjustEntryName(buf, "NewName");
-
-		byte[] bufToCompare = {78, 101, 119, 78, 97, 109, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		
-		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
-		
-		testTarEntry.adjustEntryName(buf, "AnotherNewName");
-
-		byte[] bufToCompare2 = {65, 110, 111, 116, 104, 101, 114, 78, 101, 119, 78, 97, 109, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		
-		assertEquals(Arrays.toString(bufToCompare2), Arrays.toString(buf));
-	}
-
-	@Ignore
 	@Test
 	public void testIsDirectory() {
-		fail("Not yet implemented");
+		assertFalse(testTarEntry.isDirectory());
+		
+		File file = new File("C:\\Users\\emmak\\Desktop\\Fall2021\\CptS581\\FinalExam\\Blablabla\\CptS581-FinalExam\\src\\p2\\testFile.TXT");
+		
+		try {
+			testTarEntry.getFileTarHeader(testTarHeader, file);
+		} catch (InvalidHeaderException e) {
+			e.printStackTrace();
+		}
+		
+		assertFalse(testTarEntry.isDirectory());
+		
+		file = new File("C:\\Users\\emmak\\Desktop\\Fall2021\\CptS581\\FinalExam\\Blablabla\\CptS581-FinalExam\\src\\p2\\testFolder");
+		
+		try {
+			testTarEntry.getFileTarHeader(testTarHeader, file);
+		} catch (InvalidHeaderException e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(testTarEntry.isDirectory());
 	}
 
 	@Test
 	public void testGetFileTarHeader() {
 		
-		File file = new File("testGetFileTarHeader.txt");
+		File file = new File("C:\\Users\\emmak\\Desktop\\Fall2021\\CptS581\\FinalExam\\Blablabla\\CptS581-FinalExam\\src\\p2\\testFile.TXT");
 		
 		try {
 			testTarEntry.getFileTarHeader(testTarHeader, file);
@@ -292,32 +296,6 @@ public class TarEntryTest {
 	@Ignore
 	@Test
 	public void testComputeCheckSum() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testWriteEntryHeader() {
-		
-		byte[] buf = new byte[345];
-		
-		testTarEntry.header = testTarHeader;
-		
-		testTarEntry.writeEntryHeader(buf);
-		
-		byte[] bufToCompare = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 54, 52, 49, 50, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 117, 115, 116, 97, 114, 0, 0, 0, 101, 109, 109, 97, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0};
-		
-		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
-	}
-
-	@Ignore
-	@Test
-	public void testParseTarHeader() {
-		fail("Not yet implemented");
-	}
-
-	@Ignore
-	@Test
-	public void testNameTarHeader() {
 		fail("Not yet implemented");
 	}
 

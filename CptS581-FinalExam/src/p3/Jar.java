@@ -64,8 +64,8 @@ public class Jar {
 	protected Resource[][] grabNonFileSetResources(ResourceCollection[] rcs) {
         Resource[][] result = new Resource[rcs.length][];
         for (int i = 0; i < rcs.length; i++) {
-            ArrayList<Resource> dirs = new ArrayList<Resource>();
-            ArrayList<Resource> files = new ArrayList<Resource>();
+            ArrayList<Resource> dirs = new ArrayList<>();
+            ArrayList<Resource> files = new ArrayList<>();
             for (Resource r : rcs[i]) {
                 if (r.isExists()) {
                     if (r.isDirectory()) {
@@ -82,7 +82,7 @@ public class Jar {
                         return r1.getName().compareTo(r2.getName());
                     }
                 });
-            ArrayList<Resource> rs = new ArrayList<Resource>(dirs);
+            ArrayList<Resource> rs = new ArrayList<>(dirs);
             rs.addAll(files);
             result[i] = rs.toArray(new Resource[rs.size()]);
         }
@@ -103,7 +103,7 @@ public class Jar {
             if (rs instanceof ZipScanner) {
                 ((ZipScanner) rs).setEncoding(encoding);
             }
-            Vector<Resource> resources = new Vector<Resource>();
+            Vector<Resource> resources = new Vector<>();
             if (!doFilesonly) {
                 String[] directories = rs.getIncludedDirectories();
                 for (int j = 0; j < directories.length; j++) {

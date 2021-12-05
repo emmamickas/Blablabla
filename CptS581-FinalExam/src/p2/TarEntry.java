@@ -92,7 +92,7 @@ class		TarEntry
 	TarEntry( String name )
 		{
 		this.initialize();
-		this.nameTarHeader( this.header, name );
+		this.header.nameTarHeader( name );
 		}
 
 	/**
@@ -120,7 +120,7 @@ class		TarEntry
 		throws InvalidHeaderException
 		{
 		this.initialize();
-		this.parseTarHeader( this.header, headerBuf );
+		this.header.parseTarHeader( headerBuf );
 		}
 
 	/**
@@ -174,142 +174,6 @@ class		TarEntry
 		}
 
 	/**
-	 * Get this entry's name.
-	 *
-	 * @return This entry's name.
-	 */
-	public String
-	getName()
-		{
-		return this.header.getName();
-		}
-
-	/**
-	 * Set this entry's name.
-	 *
-	 * @param name This entry's new name.
-	 */
-	public void
-	setName( String name )
-		{
-		this.header.setName(new StringBuilder( name ));
-		}
-
-	/**
-	 * Get this entry's user id.
-	 *
-	 * @return This entry's user id.
-	 */
-	public int
-	getUserId()
-		{
-		return this.header.getUserId();
-		}
-
-	/**
-	 * Set this entry's user id.
-	 *
-	 * @param userId This entry's new user id.
-	 */
-	public void
-	setUserId( int userId )
-		{
-		this.header.setUserId(userId);
-		}
-
-	/**
-	 * Get this entry's group id.
-	 *
-	 * @return This entry's group id.
-	 */
-	public int
-	getGroupId()
-		{
-		return this.header.getGroupId();
-		}
-
-	/**
-	 * Set this entry's group id.
-	 *
-	 * @param groupId This entry's new group id.
-	 */
-	public void
-	setGroupId( int groupId )
-		{
-		this.header.setGroupId(groupId);
-		}
-
-	/**
-	 * Get this entry's user name.
-	 *
-	 * @return This entry's user name.
-	 */
-	public String
-	getUserName()
-		{
-		return this.header.getUserName().toString();
-		}
-
-	/**
-	 * Set this entry's user name.
-	 *
-	 * @param userName This entry's new user name.
-	 */
-	public void
-	setUserName( String userName )
-		{
-		this.header.setUserName(new StringBuilder( userName ));
-		}
-
-	/**
-	 * Get this entry's group name.
-	 *
-	 * @return This entry's group name.
-	 */
-	public String
-	getGroupName()
-		{
-		return this.header.getGroupName().toString();
-		}
-
-	/**
-	 * Set this entry's group name.
-	 *
-	 * @param groupName This entry's new group name.
-	 */
-	public void
-	setGroupName( String groupName )
-		{
-		this.header.setGroupName(new StringBuilder( groupName ));
-		}
-
-	/**
-	 * Convenience method to set this entry's group and user ids.
-	 *
-	 * @param userId This entry's new user id.
-	 * @param groupId This entry's new group id.
-	 */
-	public void
-	setIds( int userId, int groupId )
-		{
-		this.setUserId( userId );
-		this.setGroupId( groupId );
-		}
-
-	/**
-	 * Convenience method to set this entry's group and user names.
-	 *
-	 * @param userName This entry's new user name.
-	 * @param groupName This entry's new group name.
-	 */
-	public void
-	setNames( String userName, String groupName )
-		{
-		this.setUserName( userName );
-		this.setGroupName( groupName );
-		}
-
-	/**
 	 * Set this entry's modification time. The parameter passed
 	 * to this method is in "Java time".
 	 *
@@ -333,17 +197,6 @@ class		TarEntry
 		}
 
 	/**
-	 * Set this entry's modification time.
-	 *
-	 * @param time This entry's new modification time.
-	 */
-	public Date
-	getModTime()
-		{
-		return new Date( this.header.getModTime() * 1000 );
-		}
-
-	/**
 	 * Get this entry's file.
 	 *
 	 * @return This entry's file.
@@ -352,43 +205,6 @@ class		TarEntry
 	getFile()
 		{
 		return this.file;
-		}
-
-	/**
-	 * Get this entry's file size.
-	 *
-	 * @return This entry's file size.
-	 */
-	public long
-	getSize()
-		{
-		return this.header.getSize();
-		}
-
-	/**
-	 * Set this entry's file size.
-	 *
-	 * @param size This entry's new file size.
-	 */
-	public void
-	setSize( long size )
-		{
-		this.header.setSize(size);
-		}
-
-	/**
-	 * Convenience method that will modify an entry's name directly
-	 * in place in an entry header buffer byte array.
-	 *
-	 * @param outbuf The buffer containing the entry header to modify.
-	 * @param newName The new name to place into the header buffer.
-	 */
-	public void
-	adjustEntryName( byte[] outbuf, String newName )
-		{
-		int offset = 0;
-		TarHeader.getNameBytes( new StringBuilder( newName ),
-				outbuf, offset, TarHeader.NAMELEN );
 		}
 
 	/**
@@ -403,13 +219,7 @@ class		TarEntry
 			return this.file.isDirectory();
 
 		if ( this.header != null )
-			{
-			if ( this.header.getLinkFlag() == TarHeader.LF_DIR )
-				return true;
-
-			if ( this.header.getName().endsWith( "/" ) )
-				return true;
-			}
+			return this.header.isDirectory();
 
 		return false;
 		}
@@ -426,61 +236,7 @@ class		TarEntry
 		{
 		this.file = file;
 
-		String name = file.getPath();
-		String osname = System.getProperty( "os.name" );
-		if ( osname != null )
-		{
-			// Strip off drive letters!
-			// REVIEW Would a better check be "(File.separator == '\')"?
-
-			// Per Patrick Beard:
-			String win32Prefix = "windows";
-			if ( osname.toLowerCase().startsWith( win32Prefix ) && name.length() > 2 )
-			{
-				char ch1 = name.charAt(0);
-				char ch2 = name.charAt(1);
-				if ( ch2 == ':'
-					&& ( (ch1 >= 'a' && ch1 <= 'z')
-						|| (ch1 >= 'A' && ch1 <= 'Z') ) )
-				{
-				name = name.substring( 2 );
-				}
-			}
-		}
-
-		name = name.replace( File.separatorChar, '/' );
-
-		// No absolute pathnames
-		// Windows (and Posix?) paths can start with "\\NetworkDrive\",
-		// so we loop on starting /'s.
-		
-		while (name.startsWith( "/" ))
-			name = name.substring( 1 );
-
- 		hdr.setLinkName(new StringBuilder( "" ));
-
-		hdr.setName(new StringBuilder( name ));
-
-		if ( file.isDirectory() )
-			{
-			hdr.setMode(040755);
-			hdr.setLinkFlag(TarHeader.LF_DIR);
-			if ( hdr.getName().charAt( hdr.getName().length() - 1 ) != '/' )
-				hdr.name.append( "/" );
-			}
-		else
-			{
-			hdr.setMode(0100644);
-			hdr.setLinkFlag(TarHeader.LF_NORMAL);
-			}
-
-		// UNDONE When File lets us get the userName, use it!
-
-		hdr.setSize(file.length());
-		hdr.setModTime(file.lastModified() / 1000);
-		hdr.setCheckSum(0);
-		hdr.setDevMajor(0);
-		hdr.setDevMinor(0);
+		hdr.getFileTarHeader(file);
 		}
 
 	/**
@@ -510,187 +266,6 @@ class		TarEntry
 			}
 
 		return result;
-		}
-
-	/**
-	 * Compute the checksum of a tar entry header.
-	 *
-	 * @param buf The tar entry's header buffer.
-	 * @return The computed checksum.
-	 */
-	public long
-	computeCheckSum( byte[] buf )
-		{
-		long sum = 0;
-
-		for ( int i = 0 ; i < buf.length ; ++i )
-			{
-			sum += 255 & buf[ i ];
-			}
-
-		return sum;
-		}
-
-	/**
-	 * Write an entry's header information to a header buffer.
-	 *
-	 * @param outbuf The tar entry header buffer to fill in.
-	 */
-	public void
-	writeEntryHeader( byte[] outbuf )
-		{
-		int offset = 0;
-
-		offset = TarHeader.getNameBytes( this.header.name, outbuf, offset, TarHeader.NAMELEN );
-
-		offset = TarHeader.getOctalBytes( this.header.getMode(), outbuf, offset, TarHeader.MODELEN );
-
-		offset = TarHeader.getOctalBytes( this.header.getUserId(), outbuf, offset, TarHeader.UIDLEN );
-
-		offset = TarHeader.getOctalBytes( this.header.getGroupId(), outbuf, offset, TarHeader.GIDLEN );
-
-		long size = this.header.getSize();
-
-		offset = TarHeader.getLongOctalBytes( size, outbuf, offset, TarHeader.SIZELEN );
-
-		offset = TarHeader.getLongOctalBytes( this.header.getModTime(), outbuf, offset, TarHeader.MODTIMELEN );
-
-		int csOffset = offset;
-		for ( int c = 0 ; c < TarHeader.CHKSUMLEN ; ++c )
-			outbuf[ offset++ ] = (byte) ' ';
-
-		outbuf[ offset++ ] = this.header.getLinkFlag();
-
-		offset = TarHeader.getNameBytes( this.header.getLinkName(), outbuf, offset, TarHeader.NAMELEN );
-
-		offset = TarHeader.getNameBytes( this.header.getMagic(), outbuf, offset, TarHeader.MAGICLEN );
-
-		offset = TarHeader.getNameBytes( this.header.getUserName(), outbuf, offset, TarHeader.UNAMELEN );
-
-		offset = TarHeader.getNameBytes( this.header.getGroupName(), outbuf, offset, TarHeader.GNAMELEN );
-
-		offset = TarHeader.getOctalBytes( this.header.getDevMajor(), outbuf, offset, TarHeader.DEVLEN );
-
-		offset = TarHeader.getOctalBytes( this.header.getDevMinor(), outbuf, offset, TarHeader.DEVLEN );
-
-		while (offset < outbuf.length)
-			outbuf[ offset++ ] = 0;
-
-		long checkSum = this.computeCheckSum( outbuf );
-
-		TarHeader.getCheckSumOctalBytes( checkSum, outbuf, csOffset, TarHeader.CHKSUMLEN );
-		}
-
-	/**
-	 * Parse an entry's TarHeader information from a header buffer.
-	 *
-	 * @param hdr The TarHeader to fill in from the buffer information.
-	 * @param header The tar entry header buffer to get information from.
-	 */
-	public void
-	parseTarHeader( TarHeader hdr, byte[] header )
-		throws InvalidHeaderException
-		{
-		int offset = 0;
-
-		hdr.setName(
-				TarHeader.parseName( header, offset, TarHeader.NAMELEN ));
-
-		offset += TarHeader.NAMELEN;
-
-		hdr.setMode((int)
-			TarHeader.parseOctal( header, offset, TarHeader.MODELEN ));
-
-		offset += TarHeader.MODELEN;
-
-		hdr.setUserId((int)
-			TarHeader.parseOctal( header, offset, TarHeader.UIDLEN ));
-
-		offset += TarHeader.UIDLEN;
-
-		hdr.setGroupId((int)
-			TarHeader.parseOctal( header, offset, TarHeader.GIDLEN ));
-
-		offset += TarHeader.GIDLEN;
-
-		hdr.setSize(
-			TarHeader.parseOctal( header, offset, TarHeader.SIZELEN ));
-
-		offset += TarHeader.SIZELEN;
-
-		hdr.setModTime(
-			TarHeader.parseOctal( header, offset, TarHeader.MODTIMELEN ));
-
-		offset += TarHeader.MODTIMELEN;
-
-		hdr.setCheckSum((int)
-			TarHeader.parseOctal( header, offset, TarHeader.CHKSUMLEN ));
-
-		offset += TarHeader.CHKSUMLEN;
-
-		hdr.setLinkFlag(header[ offset++ ]);
-
-		hdr.setLinkName(
-			TarHeader.parseName( header, offset, TarHeader.NAMELEN ));
-
-		offset += TarHeader.NAMELEN;
-
-		hdr.setMagic(
-			TarHeader.parseName( header, offset, TarHeader.MAGICLEN ));
-
-		offset += TarHeader.MAGICLEN;
-
-		hdr.setUserName(
-			TarHeader.parseName( header, offset, TarHeader.UNAMELEN ));
-
-		offset += TarHeader.UNAMELEN;
-
-		hdr.setGroupName(
-			TarHeader.parseName( header, offset, TarHeader.GNAMELEN ));
-
-		offset += TarHeader.GNAMELEN;
-
-		hdr.setDevMajor((int)
-			TarHeader.parseOctal( header, offset, TarHeader.DEVLEN ));
-
-		offset += TarHeader.DEVLEN;
-
-		hdr.setDevMinor((int)
-			TarHeader.parseOctal( header, offset, TarHeader.DEVLEN ));
-		}
-
-	/**
-	 * Fill in a TarHeader given only the entry's name.
-	 *
-	 * @param hdr The TarHeader to fill in.
-	 * @param name The tar entry name.
-	 */
-	public void
-	nameTarHeader( TarHeader hdr, String name )
-		{
-		boolean isDir = name.endsWith( "/" );
-
-		hdr.setCheckSum(0);
-		hdr.setDevMajor(0);
-		hdr.setDevMinor(0);
-
-		hdr.setName(new StringBuilder( name ));
-		hdr.setMode(isDir ? 040755 : 0100644);
-		hdr.setUserId(0);
-		hdr.setGroupId(0);
-		hdr.setSize(0);
-		hdr.setCheckSum(0);
-
-		hdr.setModTime((new Date()).getTime() / 1000);
-
-		hdr.setLinkFlag(isDir ? TarHeader.LF_DIR : TarHeader.LF_NORMAL);
-
-		hdr.setLinkName(new StringBuilder( "" ));
-		hdr.setUserName(new StringBuilder( "" ));
-		hdr.setGroupName(new StringBuilder( "" ));
-
-		hdr.setDevMajor(0);
-		hdr.setDevMinor(0);
 		}
 
 	}

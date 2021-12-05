@@ -339,35 +339,42 @@ public class TarHeaderTest {
 		assertEquals(100, testTarHeader.getDevMinor());
 	}
 
-	@Ignore
 	@Test
-	public void testParseOctal() {
+	public void testParseTarHeader() {
 		
-		byte[] buf = new byte[345];
+		TarHeader hdr = new TarHeader();
 		
-		testTarEntry.header = testTarHeader;
+		byte[] header = new byte[345];
 		
-		testTarEntry.writeEntryHeader(buf);
-		
-		//System.out.print(Arrays.toString(buf));
-		
+		testTarHeader.writeEntryHeader(header);
+
 		try {
-			assertEquals(345, TarHeader.parseOctal(buf, 0, 345));
+			hdr.parseTarHeader(header);
 		} catch (InvalidHeaderException e) {
 			e.printStackTrace();
 		}
+		
+		assertTrue(hdr.getName().equals(testTarHeader.getName()));
+		
+		assertEquals(hdr.getSize(), testTarHeader.getSize());
 	}
 
-	@Ignore
 	@Test
-	public void testParseName() {
-		fail("Not yet implemented");
-	}
-	
-	@Ignore
-	@Test
-	public void testGetNameBytes() {
-		fail("Not yet implemented");
+	public void testAdjustEntryName() {
+
+		byte[] buf = new byte[100];
+		
+		TarParser.adjustEntryName(buf, "NewName");
+
+		byte[] bufToCompare = {78, 101, 119, 78, 97, 109, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		
+		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
+		
+		TarParser.adjustEntryName(buf, "AnotherNewName");
+
+		byte[] bufToCompare2 = {65, 110, 111, 116, 104, 101, 114, 78, 101, 119, 78, 97, 109, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		
+		assertEquals(Arrays.toString(bufToCompare2), Arrays.toString(buf));
 	}
 
 	@Test
@@ -379,24 +386,24 @@ public class TarHeaderTest {
 		
 		int offset = 0;
 
-		offset = TarHeader.getNameBytes
+		offset = TarParser.getNameBytes
 			( testTarHeader.name, buf, offset, TarHeader.NAMELEN );
 
-		offset = TarHeader.getOctalBytes
+		offset = TarParser.getOctalBytes
 			( testTarHeader.getMode(), buf, offset, TarHeader.MODELEN );
 
-		offset = TarHeader.getOctalBytes
+		offset = TarParser.getOctalBytes
 			( testTarHeader.getUserId(), buf, offset, TarHeader.UIDLEN );
 
-		offset = TarHeader.getOctalBytes
+		offset = TarParser.getOctalBytes
 			( testTarHeader.getGroupId(), buf, offset, TarHeader.GIDLEN );
 
 		long size = testTarHeader.getSize();
 
-		offset = TarHeader.getLongOctalBytes
+		offset = TarParser.getLongOctalBytes
 			( size, buf, offset, TarHeader.SIZELEN );
 
-		offset = TarHeader.getLongOctalBytes
+		offset = TarParser.getLongOctalBytes
 			( testTarHeader.getModTime(), buf, offset, TarHeader.MODTIMELEN );
 
 		int csOffset = offset;
@@ -405,30 +412,30 @@ public class TarHeaderTest {
 
 		buf[ offset++ ] = testTarHeader.getLinkFlag();
 
-		offset = TarHeader.getNameBytes
+		offset = TarParser.getNameBytes
 			( testTarHeader.getLinkName(), buf, offset, TarHeader.NAMELEN );
 
-		offset = TarHeader.getNameBytes
+		offset = TarParser.getNameBytes
 			( testTarHeader.getMagic(), buf, offset, TarHeader.MAGICLEN );
 
-		offset = TarHeader.getNameBytes
+		offset = TarParser.getNameBytes
 			( testTarHeader.getUserName(), buf, offset, TarHeader.UNAMELEN );
 
-		offset = TarHeader.getNameBytes
+		offset = TarParser.getNameBytes
 			( testTarHeader.getGroupName(), buf, offset, TarHeader.GNAMELEN );
 
-		offset = TarHeader.getOctalBytes
+		offset = TarParser.getOctalBytes
 			( testTarHeader.getDevMajor(), buf, offset, TarHeader.DEVLEN );
 
-		offset = TarHeader.getOctalBytes
+		offset = TarParser.getOctalBytes
 			( testTarHeader.getDevMinor(), buf, offset, TarHeader.DEVLEN );
 
 		while (offset < buf.length)
 			buf[ offset++ ] = 0;
 
-		long checkSum = testTarEntry.computeCheckSum( buf );
+		long checkSum = TarParser.computeCheckSum( buf );
 
-		TarHeader.getCheckSumOctalBytes
+		TarParser.getCheckSumOctalBytes
 			( checkSum, buf, csOffset, TarHeader.CHKSUMLEN );
 		
 		byte[] bufToCompare = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 54, 52, 49, 50, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 117, 115, 116, 97, 114, 0, 0, 0, 101, 109, 109, 97, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0};
@@ -436,16 +443,32 @@ public class TarHeaderTest {
 		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
 	}
 
-	@Ignore
 	@Test
-	public void testGetLongOctalBytes() {
-		fail("Not yet implemented");
+	public void testNameTarHeader() {
+		
+		TarHeader hdr = new TarHeader();
+		
+		byte[] header = new byte[345];
+		
+		testTarHeader.writeEntryHeader(header);
+
+		hdr.nameTarHeader("New header name");
+		
+		assertTrue(hdr.getName().equals("New header name"));
 	}
 
-	@Ignore
 	@Test
-	public void testGetCheckSumOctalBytes() {
-		fail("Not yet implemented");
+	public void testWriteEntryHeader() {
+		
+		byte[] buf = new byte[345];
+		
+		testTarEntry.header = testTarHeader;
+		
+		testTarEntry.getHeader().writeEntryHeader(buf);
+		
+		byte[] bufToCompare = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 54, 52, 49, 50, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 117, 115, 116, 97, 114, 0, 0, 0, 101, 109, 109, 97, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0};
+		
+		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
 	}
 
 }

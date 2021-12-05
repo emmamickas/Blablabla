@@ -15,13 +15,16 @@
 
 package p2;
 
+import java.io.File;
+import java.util.Date;
+
 /**
  * This class encapsulates the Tar Entry Header used in Tar Archives.
  * The class also holds a number of tar constants, used mostly in headers.
  */
 
 public class
-TarHeader extends Object
+TarHeader
 	{
 	/**
 	 * The length of the name field in a header buffer.
@@ -281,6 +284,31 @@ TarHeader extends Object
 	public void setName(StringBuilder name) {
 		this.name = name;
 	}
+	/**
+	 * Convenience method to set this entry's group and user ids.
+	 *
+	 * @param userId This entry's new user id.
+	 * @param groupId This entry's new group id.
+	 */
+	public void
+	setIds( int userId, int groupId )
+		{
+		this.setUserId( userId );
+		this.setGroupId( groupId );
+		}
+
+	/**
+	 * Convenience method to set this entry's group and user names.
+	 *
+	 * @param userName This entry's new user name.
+	 * @param groupName This entry's new group name.
+	 */
+	public void
+	setNames( String userName, String groupName )
+		{
+		this.setUserName( new StringBuilder(userName) );
+		this.setGroupName( new StringBuilder (groupName) );
+		}
 
 	public
 	TarHeader()
@@ -356,171 +384,236 @@ TarHeader extends Object
 		{
 		return this.name.toString();
 		}
+	
 
 	/**
-	 * Parse an octal string from a header buffer. This is used for the
-	 * file permission mode value.
+	 * Return whether or not this entry represents a directory.
 	 *
-	 * @param header The header buffer from which to parse.
-	 * @param offset The offset into the buffer from which to parse.
-	 * @param length The number of header bytes to parse.
-	 * @return The long value of the octal string.
+	 * @return True if this entry is a directory.
 	 */
-	public static long
-	parseOctal( byte[] header, int offset, int length )
-		throws InvalidHeaderException
+	public boolean
+	isDirectory()
+	{
+		return this.linkFlag == TarHeader.LF_DIR || this.getName().endsWith( "/" );
+
+	}
+
+	public void getFileTarHeader(File file) {
+		String fileName = file.getPath();
+		String osname = System.getProperty( "os.name" );
+		if ( osname != null )
 		{
-		long result = 0;
-		boolean stillPadding = true;
+			// Strip off drive letters!
+			// REVIEW Would a better check be "(File.separator == '\')"?
 
-		int end = offset + length;
-		for ( int i = offset ; i < end ; ++i )
+			// Per Patrick Beard:
+			String win32Prefix = "windows";
+			if ( osname.toLowerCase().startsWith( win32Prefix ) && fileName.length() > 2 )
 			{
-			if ( header[i] == 0 )
-				break;
-
-			if ( header[i] == (byte) ' ' || header[i] == '0' )
+				char ch1 = fileName.charAt(0);
+				char ch2 = fileName.charAt(1);
+				if ( ch2 == ':'
+					&& ( (ch1 >= 'a' && ch1 <= 'z')
+						|| (ch1 >= 'A' && ch1 <= 'Z') ) )
 				{
-				if ( stillPadding )
-					continue;
-
-				if ( header[i] == (byte) ' ' )
-					break;
+				fileName = fileName.substring( 2 );
 				}
-			
-			stillPadding = false;
-
-			result =
-				(result << 3)
-					+ (header[i] - '0');
 			}
-
-		return result;
 		}
 
-	/**
-	 * Parse an entry name from a header buffer.
-	 *
-	 * @param header The header buffer from which to parse.
-	 * @param offset The offset into the buffer from which to parse.
-	 * @param length The number of header bytes to parse.
-	 * @return The header's entry name.
-	 */
-	public static StringBuilder
-	parseName( byte[] header, int offset, int length )
-		throws InvalidHeaderException
-		{
-		StringBuilder result = new StringBuilder( length );
+		fileName = fileName.replace( File.separatorChar, '/' );
 
-		int end = offset + length;
-		for ( int i = offset ; i < end ; ++i )
+		// No absolute pathnames
+		// Windows (and Posix?) paths can start with "\\NetworkDrive\",
+		// so we loop on starting /'s.
+		
+		while (fileName.startsWith( "/" ))
+			fileName = fileName.substring( 1 );
+
+ 		this.setLinkName(new StringBuilder( "" ));
+
+ 		this.setName(new StringBuilder( fileName ));
+
+		if ( file.isDirectory() )
 			{
-			if ( header[i] == 0 )
-				break;
-			result.append( (char)header[i] );
-			}
-
-		return result;
-		}
-
-	/**
-	 * Determine the number of bytes in an entry name.
-	 *
-	 * @param header The header buffer from which to parse.
-	 * @param offset The offset into the buffer from which to parse.
-	 * @param length The number of header bytes to parse.
-	 * @return The number of bytes in a header's entry name.
-	 */
-	public static int
-	getNameBytes( StringBuilder name, byte[] buf, int offset, int length )
-		{
-		int i;
-
-		for ( i = 0 ; i < length && i < name.length() ; ++i )
-			{
-			buf[ offset + i ] = (byte) name.charAt( i );
-			}
-
-		for ( ; i < length ; ++i )
-			{
-			buf[ offset + i ] = 0;
-			}
-
-		return offset + length;
-		}
-
-	/**
-	 * Parse an octal integer from a header buffer.
-	 *
-	 * @param header The header buffer from which to parse.
-	 * @param offset The offset into the buffer from which to parse.
-	 * @param length The number of header bytes to parse.
-	 * @return The integer value of the octal bytes.
-	 */
-	public static int
-	getOctalBytes( long value, byte[] buf, int offset, int length )
-		{
-		int idx = length - 1;
-
-		buf[ offset + idx ] = 0;
-		--idx;
-		buf[ offset + idx ] = (byte) ' ';
-		--idx;
-
-		if ( value == 0 )
-			{
-			buf[ offset + idx ] = (byte) '0';
-			--idx;
+			this.setMode(040755);
+			this.setLinkFlag(TarHeader.LF_DIR);
+			if ( this.getName().charAt( this.getName().length() - 1 ) != '/' )
+				this.name.append( "/" );
 			}
 		else
 			{
-			for ( long val = value ; idx >= 0 && val > 0 ; --idx, val = val >> 3 )
-				{
-				buf[ offset + idx ] = (byte)
-					( (byte) '0' + (byte) (val & 7) );
-				}
+			this.setMode(0100644);
+			this.setLinkFlag(TarHeader.LF_NORMAL);
 			}
 
-		for ( ; idx >= 0 ; --idx )
-			{
-			buf[ offset + idx ] = (byte) ' ';
-			}
+		// UNDONE When File lets us get the userName, use it!
 
-		return offset + length;
+		this.setSize(file.length());
+		this.setModTime(file.lastModified() / 1000);
+		this.setCheckSum(0);
+		this.setDevMajor(0);
+		this.setDevMinor(0);
+	}
+	
+	/**
+	 * Write an entry's header information to a header buffer.
+	 *
+	 * @param outbuf The tar entry header buffer to fill in.
+	 */
+	public void
+	writeEntryHeader(byte[] outbuf )
+		{
+		int offset = 0;
+	
+		offset = TarParser.getNameBytes( name, outbuf, offset, TarHeader.NAMELEN );
+	
+		offset = TarParser.getOctalBytes( getMode(), outbuf, offset, TarHeader.MODELEN );
+	
+		offset = TarParser.getOctalBytes( getUserId(), outbuf, offset, TarHeader.UIDLEN );
+	
+		offset = TarParser.getOctalBytes( getGroupId(), outbuf, offset, TarHeader.GIDLEN );
+	
+		long thisSize = getSize();
+	
+		offset = TarParser.getLongOctalBytes( thisSize, outbuf, offset, TarHeader.SIZELEN );
+	
+		offset = TarParser.getLongOctalBytes( getModTime(), outbuf, offset, TarHeader.MODTIMELEN );
+	
+		int csOffset = offset;
+		for ( int c = 0 ; c < TarHeader.CHKSUMLEN ; ++c )
+			outbuf[ offset++ ] = (byte) ' ';
+	
+		outbuf[ offset++ ] = getLinkFlag();
+	
+		offset = TarParser.getNameBytes( getLinkName(), outbuf, offset, TarHeader.NAMELEN );
+	
+		offset = TarParser.getNameBytes( getMagic(), outbuf, offset, TarHeader.MAGICLEN );
+	
+		offset = TarParser.getNameBytes( getUserName(), outbuf, offset, TarHeader.UNAMELEN );
+	
+		offset = TarParser.getNameBytes( getGroupName(), outbuf, offset, TarHeader.GNAMELEN );
+	
+		offset = TarParser.getOctalBytes( getDevMajor(), outbuf, offset, TarHeader.DEVLEN );
+	
+		offset = TarParser.getOctalBytes( getDevMinor(), outbuf, offset, TarHeader.DEVLEN );
+	
+		while (offset < outbuf.length)
+			outbuf[ offset++ ] = 0;
+	
+		long fileCheckSum = TarParser.computeCheckSum( outbuf );
+	
+		TarParser.getCheckSumOctalBytes( fileCheckSum, outbuf, csOffset, TarHeader.CHKSUMLEN );
 		}
 
 	/**
-	 * Parse an octal long integer from a header buffer.
+	 * Parse an entry's TarHeader information from a header buffer.
 	 *
-	 * @param header The header buffer from which to parse.
-	 * @param offset The offset into the buffer from which to parse.
-	 * @param length The number of header bytes to parse.
-	 * @return The long value of the octal bytes.
+	 * @param header The tar entry header buffer to get information from.
 	 */
-	public static int
-	getLongOctalBytes( long value, byte[] buf, int offset, int length )
+	public void
+	parseTarHeader( byte[] header )
+		throws InvalidHeaderException
 		{
-		byte[] temp = new byte[ length + 1 ];
-		TarHeader.getOctalBytes( value, temp, 0, length + 1 );
-		System.arraycopy( temp, 0, buf, offset, length );
-		return offset + length;
+		int offset = 0;
+	
+		setName(
+				TarParser.parseName( header, offset, TarHeader.NAMELEN ));
+	
+		offset += TarHeader.NAMELEN;
+	
+		setMode((int)
+				TarParser.parseOctal( header, offset, TarHeader.MODELEN ));
+	
+		offset += TarHeader.MODELEN;
+	
+		setUserId((int)
+				TarParser.parseOctal( header, offset, TarHeader.UIDLEN ));
+	
+		offset += TarHeader.UIDLEN;
+	
+		setGroupId((int)
+				TarParser.parseOctal( header, offset, TarHeader.GIDLEN ));
+	
+		offset += TarHeader.GIDLEN;
+	
+		setSize(
+				TarParser.parseOctal( header, offset, TarHeader.SIZELEN ));
+	
+		offset += TarHeader.SIZELEN;
+	
+		setModTime(
+				TarParser.parseOctal( header, offset, TarHeader.MODTIMELEN ));
+	
+		offset += TarHeader.MODTIMELEN;
+	
+		setCheckSum((int)
+				TarParser.parseOctal( header, offset, TarHeader.CHKSUMLEN ));
+	
+		offset += TarHeader.CHKSUMLEN;
+	
+		setLinkFlag(header[ offset++ ]);
+	
+		setLinkName(
+			TarParser.parseName( header, offset, TarHeader.NAMELEN ));
+	
+		offset += TarHeader.NAMELEN;
+	
+		setMagic(
+				TarParser.parseName( header, offset, TarHeader.MAGICLEN ));
+	
+		offset += TarHeader.MAGICLEN;
+	
+		setUserName(
+				TarParser.parseName( header, offset, TarHeader.UNAMELEN ));
+	
+		offset += TarHeader.UNAMELEN;
+	
+		setGroupName(
+				TarParser.parseName( header, offset, TarHeader.GNAMELEN ));
+	
+		offset += TarHeader.GNAMELEN;
+	
+		setDevMajor((int)
+				TarParser.parseOctal( header, offset, TarHeader.DEVLEN ));
+	
+		offset += TarHeader.DEVLEN;
+	
+		setDevMinor((int)
+				TarParser.parseOctal( header, offset, TarHeader.DEVLEN ));
 		}
 
 	/**
-	 * Parse the checksum octal integer from a header buffer.
+	 * Fill in a TarHeader given only the entry's name.
 	 *
-	 * @param header The header buffer from which to parse.
-	 * @param offset The offset into the buffer from which to parse.
-	 * @param length The number of header bytes to parse.
-	 * @return The integer value of the entry's checksum.
+	 * @param name The tar entry name.
 	 */
-	public static int
-	getCheckSumOctalBytes( long value, byte[] buf, int offset, int length )
+	public void
+	nameTarHeader( String name )
 		{
-		TarHeader.getOctalBytes( value, buf, offset, length );
-		buf[ offset + length - 1 ] = (byte) ' ';
-		buf[ offset + length - 2 ] = 0;
-		return offset + length;
+		boolean isDir = name.endsWith( "/" );
+	
+		setCheckSum(0);
+		setDevMajor(0);
+		setDevMinor(0);
+	
+		setName(new StringBuilder( name ));
+		setMode(isDir ? 040755 : 0100644);
+		setUserId(0);
+		setGroupId(0);
+		setSize(0);
+		setCheckSum(0);
+	
+		setModTime((new Date()).getTime() / 1000);
+	
+		setLinkFlag(isDir ? TarHeader.LF_DIR : TarHeader.LF_NORMAL);
+	
+		setLinkName(new StringBuilder( "" ));
+		setUserName(new StringBuilder( "" ));
+		setGroupName(new StringBuilder( "" ));
+	
+		setDevMajor(0);
+		setDevMinor(0);
 		}
 
 	}
