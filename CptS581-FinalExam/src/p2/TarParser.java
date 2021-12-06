@@ -134,6 +134,12 @@ public class TarParser {
 	public static int
 	getNameBytes( StringBuilder name, byte[] buf, int offset, int length )
 		{
+		getNameOffset(name, buf, offset, length);
+
+		return offset + length;
+		}
+
+	public static void getNameOffset(StringBuilder name, byte[] buf, int offset, int length) {
 		int i;
 
 		for ( i = 0 ; i < length && i < name.length() ; ++i )
@@ -145,9 +151,7 @@ public class TarParser {
 			{
 			buf[ offset + i ] = 0;
 			}
-
-		return offset + length;
-		}
+	}
 
 	/**
 	 * Parse an octal integer from a header buffer.
@@ -160,6 +164,12 @@ public class TarParser {
 	public static int
 	getOctalBytes( long value, byte[] buf, int offset, int length )
 		{
+		getOctalOffset(value, buf, offset, length);
+
+		return offset + length;
+		}
+
+	public static void getOctalOffset(long value, byte[] buf, int offset, int length) {
 		int idx = length - 1;
 
 		buf[ offset + idx ] = 0;
@@ -185,9 +195,7 @@ public class TarParser {
 			{
 			buf[ offset + idx ] = (byte) ' ';
 			}
-
-		return offset + length;
-		}
+	}
 
 	/**
 	 * Parse an octal long integer from a header buffer.

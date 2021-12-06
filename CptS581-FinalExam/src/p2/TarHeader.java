@@ -405,6 +405,35 @@ TarHeader
 	 * @param file The file from which to get the header information.
 	 */
 	public void getFileTarHeader(File file) {
+		String fileName = getFileName(file);
+
+ 		this.setLinkName(new StringBuilder( "" ));
+
+ 		this.setName(new StringBuilder( fileName ));
+
+		if ( file.isDirectory() )
+			{
+			this.setMode(040755);
+			this.setLinkFlag(TarHeader.LF_DIR);
+			if ( this.getName().charAt( this.getName().length() - 1 ) != '/' )
+				this.name.append( "/" );
+			}
+		else
+			{
+			this.setMode(0100644);
+			this.setLinkFlag(TarHeader.LF_NORMAL);
+			}
+
+		// UNDONE When File lets us get the userName, use it!
+
+		this.setSize(file.length());
+		this.setModTime(file.lastModified() / 1000);
+		this.setCheckSum(0);
+		this.setDevMajor(0);
+		this.setDevMinor(0);
+	}
+
+	public String getFileName(File file) {
 		String fileName = file.getPath();
 		String osname = System.getProperty( "os.name" );
 		if ( osname != null )
@@ -435,31 +464,7 @@ TarHeader
 		
 		while (fileName.startsWith( "/" ))
 			fileName = fileName.substring( 1 );
-
- 		this.setLinkName(new StringBuilder( "" ));
-
- 		this.setName(new StringBuilder( fileName ));
-
-		if ( file.isDirectory() )
-			{
-			this.setMode(040755);
-			this.setLinkFlag(TarHeader.LF_DIR);
-			if ( this.getName().charAt( this.getName().length() - 1 ) != '/' )
-				this.name.append( "/" );
-			}
-		else
-			{
-			this.setMode(0100644);
-			this.setLinkFlag(TarHeader.LF_NORMAL);
-			}
-
-		// UNDONE When File lets us get the userName, use it!
-
-		this.setSize(file.length());
-		this.setModTime(file.lastModified() / 1000);
-		this.setCheckSum(0);
-		this.setDevMajor(0);
-		this.setDevMinor(0);
+		return fileName;
 	}
 	
 	/**
@@ -470,6 +475,17 @@ TarHeader
 	public void
 	writeEntryHeader(byte[] outbuf )
 		{
+		int offset = getEntryInformationOffset(outbuf);
+	
+		int csOffset = offset;
+		getEntryNameOffset(outbuf, offset);
+	
+		long fileCheckSum = TarParser.computeCheckSum( outbuf );
+	
+		TarParser.getCheckSumOctalBytes( fileCheckSum, outbuf, csOffset, TarHeader.CHKSUMLEN );
+		}
+
+	public int getEntryInformationOffset(byte[] outbuf) {
 		int offset = 0;
 	
 		offset = TarParser.getNameBytes( name, outbuf, offset, TarHeader.NAMELEN );
@@ -485,8 +501,10 @@ TarHeader
 		offset = TarParser.getLongOctalBytes( thisSize, outbuf, offset, TarHeader.SIZELEN );
 	
 		offset = TarParser.getLongOctalBytes( getModTime(), outbuf, offset, TarHeader.MODTIMELEN );
-	
-		int csOffset = offset;
+		return offset;
+	}
+
+	public void getEntryNameOffset(byte[] outbuf, int offset) {
 		for ( int c = 0 ; c < TarHeader.CHKSUMLEN ; ++c )
 			outbuf[ offset++ ] = (byte) ' ';
 	
@@ -506,11 +524,7 @@ TarHeader
 	
 		while (offset < outbuf.length)
 			outbuf[ offset++ ] = 0;
-	
-		long fileCheckSum = TarParser.computeCheckSum( outbuf );
-	
-		TarParser.getCheckSumOctalBytes( fileCheckSum, outbuf, csOffset, TarHeader.CHKSUMLEN );
-		}
+	}
 
 	/**
 	 * Parse an entry's TarHeader information from a header buffer.

@@ -2,6 +2,7 @@ package p2;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.junit.After;
@@ -469,6 +470,42 @@ public class TarHeaderTest {
 		byte[] bufToCompare = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 32, 32, 32, 54, 52, 49, 50, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 117, 115, 116, 97, 114, 0, 0, 0, 101, 109, 109, 97, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 48, 32, 0, 32, 32, 32, 32, 32, 48, 32, 0};
 		
 		assertEquals(Arrays.toString(bufToCompare), Arrays.toString(buf));
+	}
+	
+	@Test
+	public void testGetFileTarHeader() {
+		
+		File file = new File("C:\\Users\\emmak\\Desktop\\Fall2021\\CptS581\\FinalExam\\Blablabla\\CptS581-FinalExam\\src\\p2\\testFile.TXT");
+		
+		try {
+			testTarEntry.getFileTarHeader(testTarHeader, file);
+		} catch (InvalidHeaderException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(testTarEntry.file, file);
+		
+
+		String name = file.getPath();
+		String osname = System.getProperty( "os.name" );
+		if ( osname != null )
+		{
+			String win32Prefix = "windows";
+			if ( osname.toLowerCase().startsWith( win32Prefix ) )
+			{
+				if ( name.length() > 2 )
+				{
+					char ch1 = name.charAt(0);
+					char ch2 = name.charAt(1);
+					if ( ch2 == ':'
+						&& ( (ch1 >= 'a' && ch1 <= 'z')
+							|| (ch1 >= 'A' && ch1 <= 'Z') ) )
+					{
+						name = name.substring( 2 );
+					}
+				}
+			}
+		}
 	}
 
 }
